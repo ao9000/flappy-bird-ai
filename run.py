@@ -22,27 +22,6 @@ def setup_game_window():
     return screen
 
 
-def load_assets():
-    # Add relative paths to file names
-    # Load assets into pygame
-    transparent_dict = ["bird", "pipe", "numbers", "gameover", "message"]
-    for key, value in copy.deepcopy(sprites_dict).items():
-        if any(item in key for item in transparent_dict):
-            if isinstance(value, list):
-                for index, value in enumerate(value):
-                    sprites_dict[key][index] = pygame.image.load(os.path.join(ASSET_PATH, value)).convert_alpha()
-            else:
-                sprites_dict[key] = pygame.image.load(os.path.join(ASSET_PATH, value)).convert_alpha()
-        else:
-            if isinstance(value, list):
-                for index, value in enumerate(value):
-                    sprites_dict[key][index] = pygame.image.load(os.path.join(ASSET_PATH, value)).convert()
-            else:
-                sprites_dict[key] = pygame.image.load(os.path.join(ASSET_PATH, value)).convert()
-
-    return sprites_dict
-
-
 def main():
     pygame.init()
 
@@ -70,10 +49,10 @@ def main():
                     quit_game()
 
             # Display background
-            screen.blit(sprites_dict['background-day'], (0, 0))
+            screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-            # Add base
-            screen.blit(sprites_dict['base'], (0, DISPLAY_HEIGHT - sprites_dict['base'].get_height()))
+
+
 
             # Update screen
             pygame.display.update()

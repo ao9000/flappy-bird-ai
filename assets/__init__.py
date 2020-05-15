@@ -1,3 +1,9 @@
+import copy
+import os
+import pygame
+
+ASSET_PATH = "assets"
+
 sprites_dict = {
     # Texts
     "numbers": [
@@ -45,3 +51,12 @@ sprites_dict = {
     "pipe-green": "sprites/pipe-green.png",
     "pipe-red": "sprites/pipe-red.png"
 }
+
+# Add relative paths to file names
+# Load assets into pygame
+for key, value in copy.deepcopy(sprites_dict).items():
+    if isinstance(value, list):
+        for index, value in enumerate(value):
+            sprites_dict[key][index] = pygame.image.load(os.path.join(ASSET_PATH, value))
+    else:
+        sprites_dict[key] = pygame.image.load(os.path.join(ASSET_PATH, value))

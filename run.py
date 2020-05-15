@@ -1,8 +1,10 @@
+from assets import sprites_dict
 import pygame
 import sys
 import os
 import copy
 
+FPS = 30
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 288, 512
 ASSET_PATH = "assets"
 
@@ -20,59 +22,7 @@ def setup_game_window():
     return screen
 
 
-def setup_game_clock():
-    clock = pygame.time.Clock()
-
-
 def load_assets():
-    sprites_dict = {
-        # Texts
-        "numbers": [
-            "sprites/0.png",
-            "sprites/1.png",
-            "sprites/2.png",
-            "sprites/3.png",
-            "sprites/4.png",
-            "sprites/5.png",
-            "sprites/6.png",
-            "sprites/7.png",
-            "sprites/8.png",
-            "sprites/9.png"
-        ],
-        "gameover": "sprites/gameover.png",
-        "message": "sprites/message.png",
-
-        # Backgrounds
-        "background-day": "sprites/background-day.png",
-        "background-night": "sprites/background-night.png",
-
-        # Base
-        "base": "sprites/base.png",
-
-        # Birds
-        "bluebird": [
-            "sprites/bluebird-downflap.png",
-            "sprites/bluebird-midflap.png",
-            "sprites/bluebird-upflap.png"
-        ],
-
-        "redbird": [
-            "sprites/redbird-downflap.png",
-            "sprites/redbird-midflap.png",
-            "sprites/redbird-upflap.png"
-        ],
-
-        "yellowbird": [
-            "sprites/yellowbird-downflap.png",
-            "sprites/yellowbird-midflap.png",
-            "sprites/yellowbird-upflap.png"
-        ],
-
-        # Pipes
-        "pipe-green": "sprites/pipe-green.png",
-        "pipe-red": "sprites/pipe-red.png"
-    }
-
     # Add relative paths to file names
     # Load assets into pygame
     transparent_dict = ["bird", "pipe", "numbers", "gameover", "message"]
@@ -96,11 +46,19 @@ def load_assets():
 def main():
     pygame.init()
 
+    # Setup window properties
     screen = setup_game_window()
-    sprites_dict = load_assets()
+
+    # Load assets
+    # sprites_dict = load_assets()
+
+    # Init clock
+    clock = pygame.time.Clock()
 
     # Game loop
     while True:
+        # Define FPS
+        clock.tick(FPS)
         for event in pygame.event.get():
             # Quit game when X is pressed
             if event.type == pygame.QUIT:

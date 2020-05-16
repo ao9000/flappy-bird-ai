@@ -1,12 +1,11 @@
 from assets import sprites_dict
+from base import Base
+
 import pygame
 import sys
-import os
-import copy
 
 FPS = 30
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 288, 512
-ASSET_PATH = "assets"
 
 
 def quit_game():
@@ -51,8 +50,9 @@ def main():
             # Display background
             screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-
-
+            # Initialize first & second base
+            base1 = Base(0, DISPLAY_HEIGHT - sprites_dict['base'].get_height()).draw_to_screen(screen)
+            base2 = Base(DISPLAY_WIDTH, DISPLAY_HEIGHT - sprites_dict['base'].get_height()).draw_to_screen(screen)
 
             # Update screen
             pygame.display.update()

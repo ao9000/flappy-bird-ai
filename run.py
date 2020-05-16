@@ -21,16 +21,23 @@ def setup_game_window():
     return screen
 
 
+def base_move_handler(base1, base2):
+    base1.move()
+    base2.move()
+
+    if base1.x + sprites_dict['base'].get_width() <= 0:
+        base1.x = DISPLAY_WIDTH
+    elif base2.x + sprites_dict['base'].get_width() <= 0:
+        base2.x = DISPLAY_WIDTH
+
+
 def main():
     pygame.init()
 
     # Setup window properties
     screen = setup_game_window()
 
-    # Load assets
-    # sprites_dict = load_assets()
-
-    # Init clock
+    # Initialize clock
     clock = pygame.time.Clock()
 
     # Initialize background
@@ -58,8 +65,7 @@ def main():
         base1.draw_to_screen(screen)
         base2.draw_to_screen(screen)
 
-        base1.move()
-        base2.move()
+        base_move_handler(base1, base2)
 
         # Update screen
         pygame.display.update()

@@ -39,10 +39,6 @@ def base_animation_handler(base1, base2):
         base2.x = DISPLAY_WIDTH
 
 
-def bird_animation_handler(bird):
-    pass
-
-
 def main():
     # Initialize pygame module
     pygame.init()

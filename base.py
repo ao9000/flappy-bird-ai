@@ -4,6 +4,7 @@ from assets import sprites_dict
 class Base:
     velocity = 5
     image = sprites_dict['base']
+    width, height = image.get_width(), image.get_height()
 
     def __init__(self, x, y):
         self._x = x

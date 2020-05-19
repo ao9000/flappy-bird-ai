@@ -89,7 +89,14 @@ def main():
         bird.draw_to_screen(screen)
 
         if bird_jump:
+            # Bird jump
             bird.jump()
+            bird.calculate_new_y()
+
+        else:
+            # Bird no jump
+            bird.do_nothing()
+            bird.calculate_new_y()
 
         # Update screen
         pygame.display.update()

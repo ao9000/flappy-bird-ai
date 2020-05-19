@@ -16,15 +16,16 @@ class Bird:
         self._rect = None
 
     def jump(self):
-        self._velocity += 30
+        self._velocity = 10
 
     def do_nothing(self):
         self._velocity -= 1
 
+    def calculate_new_y(self):
+        # Terminal velocity
         if self._velocity > 16:
             self._velocity = 16
 
-    def calculate_new_y(self):
         self._y -= self._velocity
 
     def cycle_bird_state(self):
@@ -42,11 +43,8 @@ class Bird:
     def draw_to_screen(self, screen):
         image = [bird.convert_alpha() for bird in self.image]
 
-        # Bird velocity
-        self.do_nothing()
-        self.calculate_new_y()
-        print(self._velocity)
-
         # Cycle flap animation states
         self.flap_animation_tick_handler()
+
+        # Draw bird
         self._rect = screen.blit(image[self._state], (self._x, self._y))

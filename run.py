@@ -40,15 +40,15 @@ def base_animation_handler(base1, base2):
         base2.x = DISPLAY_WIDTH
 
 
-def check_collide(bird, base):
+def check_crash(bird, base):
     if bird.rect.collidelist([item.rect for item in base]) != -1:
         return True
     
     return False
 
 
-def gameover(screen):
-    # Gameover text
+def gameover_text(screen):
+    # Game-over text
     screen.blit(sprites_dict['gameover'].convert_alpha(),
                 ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
                  (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
@@ -70,12 +70,13 @@ def main():
 
     # Initialize bird
     bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
-    
-    dead = False
+
+    # Initialize crash status
+    crashed = False
 
     # Game loop
     while True:
-        bird_jump = False
+        jump = False
         # Define FPS
         clock.tick(FPS)
         # Loop events
@@ -92,34 +93,36 @@ def main():
                 elif event.key == 32:
                     bird_jump = True
 
-        if dead:
-            gameover(screen)
-            pygame.display.update()
-            continue
+        # Check if alive
+        if not crashed:
+            # Clear previous screen state & render background
+            screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-        # Clear previous screen state & render background
-        screen.blit(sprites_dict['background-day'].convert(), (0, 0))
+            # Draw base to screen
+            base1.draw_to_screen(screen)
+            base2.draw_to_screen(screen)
 
-        # Draw base to screen
-        base1.draw_to_screen(screen)
-        base2.draw_to_screen(screen)
+            # Update base coordinates
+            base_animation_handler(base1, base2)
 
-        # Update base coordinates
-        base_animation_handler(base1, base2)
+            # Draw bird to screen
+            bird.draw_to_screen(screen)
 
-        # Draw bird to screen
-        bird.draw_to_screen(screen)
+            if jump:
+                # Bird jump
+                bird.jump()
 
-        if bird_jump:
-            # Bird jump
-            bird.jump()
+            else:
+                # Bird no jump
+                bird.do_nothing()
+
+            # Check if crashed
+            if check_crash(bird, [base1, base2]):
+                crashed = True
 
         else:
-            # Bird no jump
-            bird.do_nothing()
-
-        if check_collide(bird, [base1, base2]):
-            dead = True
+            # Dead
+            gameover_text(screen)
 
         # Update screen
         pygame.display.update()

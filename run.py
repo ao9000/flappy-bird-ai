@@ -1,6 +1,7 @@
 from assets import sprites_dict
 from base import Base
 from bird import Bird
+from pipe import Pipe
 
 import pygame
 import sys
@@ -38,6 +39,9 @@ def base_animation_handler(base1, base2):
     elif base2.x + sprites_dict['base'].get_width() <= 0:
         base2.x = DISPLAY_WIDTH
 
+def pipe_animation(pipe):
+    pipe.move()
+    
 
 def main():
     # Initialize pygame module
@@ -55,7 +59,9 @@ def main():
 
     # Initialize bird
     bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
-
+    
+    #Initialize pipe
+    pipe = Pipe(10,10)
     # Game loop
     while True:
         bird_jump = False
@@ -84,9 +90,13 @@ def main():
 
         # Update base coordinates
         base_animation_handler(base1, base2)
+        pipe_animation(pipe)
 
         # Draw bird to screen
         bird.draw_to_screen(screen)
+        
+        #summon PIPES
+        pipe.draw_to_screen(screen)
 
         if bird_jump:
             # Bird jump

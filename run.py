@@ -39,9 +39,20 @@ def base_animation_handler(base1, base2):
     elif base2.x + sprites_dict['base'].get_width() <= 0:
         base2.x = DISPLAY_WIDTH
 
-def pipe_animation(pipe):
-    pipe.move()
+
+def check_collide(bird, base):
+    if bird.rect.collidelist([item.rect for item in base]) != -1:
+        return True
     
+    return False
+
+
+def gameover(screen):
+    # Gameover text
+    screen.blit(sprites_dict['gameover'].convert_alpha(),
+                ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
+                 (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
+
 
 def main():
     # Initialize pygame module
@@ -60,8 +71,8 @@ def main():
     # Initialize bird
     bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
     
-    #Initialize pipe
-    pipe = Pipe(10,10)
+    dead = False
+
     # Game loop
     while True:
         bird_jump = False
@@ -81,6 +92,11 @@ def main():
                 elif event.key == 32:
                     bird_jump = True
 
+        if dead:
+            gameover(screen)
+            pygame.display.update()
+            continue
+
         # Clear previous screen state & render background
         screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
@@ -90,13 +106,9 @@ def main():
 
         # Update base coordinates
         base_animation_handler(base1, base2)
-        pipe_animation(pipe)
 
         # Draw bird to screen
         bird.draw_to_screen(screen)
-        
-        #summon PIPES
-        pipe.draw_to_screen(screen)
 
         if bird_jump:
             # Bird jump
@@ -105,6 +117,9 @@ def main():
         else:
             # Bird no jump
             bird.do_nothing()
+
+        if check_collide(bird, [base1, base2]):
+            dead = True
 
         # Update screen
         pygame.display.update()

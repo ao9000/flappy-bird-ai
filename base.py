@@ -12,6 +12,10 @@ class Base:
         self._rect = None
 
     @property
+    def rect(self):
+        return self._rect
+
+    @property
     def x(self):
         return self._x
 

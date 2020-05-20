@@ -19,6 +19,10 @@ class Bird:
         self._velocity = 0
         self._rect = None
 
+    @property
+    def rect(self):
+        return self._rect
+
     def jump(self):
         # Set velocity for jumping
         self._velocity = 10.5

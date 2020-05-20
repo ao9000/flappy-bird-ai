@@ -20,47 +20,74 @@ class Bird:
         self._rect = None
 
     def jump(self):
-        self._velocity = 10
+        # Set velocity for jumping
+        self._velocity = 10.5
+        self.calculate_new_y()
+
+        # Set tilt for jump
+        self.tilt_up()
 
     def do_nothing(self):
+        # Decay velocity when not jumping
         self._velocity -= 1
+        self.calculate_new_y()
+
+        # Set tilt for not jumping
+        self.tilt_down()
+
+    def calculate_new_y(self):
+        # Terminal velocity
+        if self._velocity > 12:
+            self._velocity = 12
+
+        # Set new y
+        self._y -= self._velocity
 
     def tilt_down(self):
+        # Increment tick
         self._tilt_tick += 1
 
+        # If tick pass threshold, tilt down
         if self._tilt_tick > 15:
             self._tilt -= 10
             self.tilt_handler()
 
     def tilt_up(self):
+        # Tilt up
         self._tilt = 20
         self.tilt_handler()
+        # Reset tick
         self._tilt_tick = 0
 
     def tilt_handler(self):
+        # Make sure the tilt stays between min & max thresholds
         if self._tilt > self.max_tilt:
             self._tilt = self.max_tilt
         elif self._tilt < self.min_tilt:
             self._tilt = self.min_tilt
 
-    def calculate_new_y(self):
-        # Terminal velocity
-        if self._velocity > 16:
-            self._velocity = 16
+    def flap_animation_tick_handler(self):
+        # Nose dive
+        if self._tilt == -90:
+            self._state = 1
+        else:
+            # Increment tick
+            self._animation_tick += 1
 
-        self._y -= self._velocity
+            # Cycle animation if pass threshold tick
+            if self._animation_tick >= Bird.state_cycle_rate:
+                # Cycle animation
+                self.cycle_bird_state()
+                # Reset tick
+                self._animation_tick = 0
 
     def cycle_bird_state(self):
+        # Cycle bird animation
         self._state += 1
+
+        # Set index back into loop
         if self._state > 2:
             self._state = 0
-
-    def flap_animation_tick_handler(self):
-        self._animation_tick += 1
-
-        if self._animation_tick >= Bird.state_cycle_rate:
-            self.cycle_bird_state()
-            self._animation_tick = 0
 
     @staticmethod
     def tilt_bird(bird, angle):

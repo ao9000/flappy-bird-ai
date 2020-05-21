@@ -38,6 +38,16 @@ def base_animation_handler(base_list):
             base.x = DISPLAY_WIDTH
 
 
+def pipes_animation_handler(pipe_list):
+    # Check if any pipe has exited the left side of the screen
+    # If true, place pipe back to the right side
+    for pipe in pipe_list:
+        pipe.move()
+        if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
+            pipe.random_y()
+            pipe.x = DISPLAY_WIDTH
+
+
 def check_crash(bird, base):
     if bird.rect.collidelist([item.rect for item in base]) != -1:
         return True
@@ -60,9 +70,14 @@ def initialize_game_elements():
     # Initialize bird
     bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
 
+    # Initialize pipes
+    pipe1 = Pipe(DISPLAY_WIDTH)
+    pipe2 = Pipe(DISPLAY_WIDTH + Pipe.interval)
+
     return {
         "base": [base1, base2],
-        "bird": bird
+        "bird": bird,
+        "pipe": [pipe1, pipe2]
     }
 
 
@@ -108,12 +123,19 @@ def main():
             # Clear previous screen state & render background
             screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-            # Draw bases to screen
-            for base in game_elements_dict['base']:
-                base.draw_to_screen(screen)
+            # Update pipes coordinates
+            pipes_animation_handler(game_elements_dict['pipe'])
+
+            # Draw pipes to the screen
+            for pipe in game_elements_dict['pipe']:
+                pipe.draw_to_screen(screen)
 
             # Update base coordinates
             base_animation_handler(game_elements_dict['base'])
+
+            # Draw bases to screen
+            for base in game_elements_dict['base']:
+                base.draw_to_screen(screen)
 
             # Draw bird to screen
             game_elements_dict['bird'].draw_to_screen(screen)

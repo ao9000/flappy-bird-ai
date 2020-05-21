@@ -27,23 +27,21 @@ def setup_game_window():
     return screen
 
 
-def base_animation_handler(base1, base2):
-    # Move both bases
-    base1.move()
-    base2.move()
+def base_animation_handler(base_list):
+    for base in base_list:
+        # Move both bases
+        base.move()
 
-    # Check if any base has exited the left side of the screen
-    # If true, place base back to the right side
-    if base1.x + sprites_dict['base'].get_width() <= 0:
-        base1.x = DISPLAY_WIDTH
-    elif base2.x + sprites_dict['base'].get_width() <= 0:
-        base2.x = DISPLAY_WIDTH
+        # Check if any base has exited the left side of the screen
+        # If true, place base back to the right side
+        if base.x + sprites_dict['base'].get_width() <= 0:
+            base.x = DISPLAY_WIDTH
 
 
 def check_crash(bird, base):
     if bird.rect.collidelist([item.rect for item in base]) != -1:
         return True
-    
+
     return False
 
 
@@ -52,6 +50,20 @@ def gameover_text(screen):
     screen.blit(sprites_dict['gameover'].convert_alpha(),
                 ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
                  (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
+
+
+def initialize_game_elements():
+    # Initialize first & second base
+    base1 = Base(0, DISPLAY_HEIGHT - Base.height)
+    base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
+
+    # Initialize bird
+    bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
+
+    return {
+        "base": [base1, base2],
+        "bird": bird
+    }
 
 
 def main():
@@ -64,15 +76,12 @@ def main():
     # Initialize clock
     clock = pygame.time.Clock()
 
-    # Initialize first & second base
-    base1 = Base(0, DISPLAY_HEIGHT - Base.height)
-    base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
-
-    # Initialize bird
-    bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
+    # Initialize game elements
+    game_elements_dict = initialize_game_elements()
 
     # Initialize crash status
     crashed = False
+    start = False
 
     # Game loop
     while True:
@@ -91,33 +100,35 @@ def main():
                     quit_game()
                 # Space was pressed, flap bird
                 elif event.key == 32:
-                    bird_jump = True
+                    jump = True
+                    start = True
 
         # Check if alive
         if not crashed:
             # Clear previous screen state & render background
             screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-            # Draw base to screen
-            base1.draw_to_screen(screen)
-            base2.draw_to_screen(screen)
+            # Draw bases to screen
+            for base in game_elements_dict['base']:
+                base.draw_to_screen(screen)
 
             # Update base coordinates
-            base_animation_handler(base1, base2)
+            base_animation_handler(game_elements_dict['base'])
 
             # Draw bird to screen
-            bird.draw_to_screen(screen)
+            game_elements_dict['bird'].draw_to_screen(screen)
 
-            if jump:
-                # Bird jump
-                bird.jump()
+            if start:
+                if jump:
+                    # Bird jump
+                    game_elements_dict['bird'].jump()
 
-            else:
-                # Bird no jump
-                bird.do_nothing()
+                else:
+                    # Bird no jump
+                    game_elements_dict['bird'].do_nothing()
 
             # Check if crashed
-            if check_crash(bird, [base1, base2]):
+            if check_crash(game_elements_dict['bird'], game_elements_dict['base']):
                 crashed = True
 
         else:

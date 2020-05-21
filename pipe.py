@@ -8,7 +8,7 @@ class Pipe:
     width, height = image[0].get_width(), image[0].get_height()
     velocity = 5
     gap = 125
-    interval = 150
+    interval = 144 + width/2
 
     def __init__(self, x):
         self._x = x

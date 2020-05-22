@@ -1,4 +1,5 @@
 from assets import sprites_dict
+from config_handler import config
 import pygame
 import random
 
@@ -8,7 +9,7 @@ class Pipe:
     width, height = image[0].get_width(), image[0].get_height()
     velocity = 5
     gap = 125
-    interval = 144 + width/2
+    interval = (config['General']['DISPLAY_WIDTH']/2) + (width/2)
 
     def __init__(self, x):
         self._x = x
@@ -38,7 +39,8 @@ class Pipe:
         self._lower_y = val
 
     def random_y(self):
-        y = random.randint(round(512 * (3 / 10)), round(512 * (7 / 10)))
+        y = random.randint(round(config['General']['DISPLAY_HEIGHT'] * (3 / 10)),
+                           round(config['General']['DISPLAY_HEIGHT'] * (7 / 10)))
 
         self._upper_y = (y - (self.gap + self.height))
         self._lower_y = y

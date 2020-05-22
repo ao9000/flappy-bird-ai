@@ -1,13 +1,11 @@
 from assets import sprites_dict
+from config_handler import config
 from base import Base
 from bird import Bird
 from pipe import Pipe
 
 import pygame
 import sys
-
-FPS = 30
-DISPLAY_WIDTH, DISPLAY_HEIGHT = 288, 512
 
 
 def quit_game():
@@ -18,7 +16,7 @@ def quit_game():
 
 def setup_game_window():
     # Define screen size
-    display_dimensions = (DISPLAY_WIDTH, DISPLAY_HEIGHT)
+    display_dimensions = (config['General']['DISPLAY_WIDTH'], config['General']['DISPLAY_HEIGHT'])
     screen = pygame.display.set_mode(display_dimensions)
 
     # Define window caption
@@ -35,7 +33,7 @@ def base_animation_handler(base_list):
         # Check if any base has exited the left side of the screen
         # If true, place base back to the right side
         if base.x + sprites_dict['base'].get_width() <= 0:
-            base.x = DISPLAY_WIDTH
+            base.x = config['General']['DISPLAY_WIDTH']
 
 
 def pipes_animation_handler(pipe_list):
@@ -45,7 +43,7 @@ def pipes_animation_handler(pipe_list):
         pipe.move()
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
-            pipe.x = DISPLAY_WIDTH
+            pipe.x = config['General']['DISPLAY_WIDTH']
 
 
 def check_crash(bird, base):
@@ -58,21 +56,21 @@ def check_crash(bird, base):
 def gameover_text(screen):
     # Game-over text
     screen.blit(sprites_dict['gameover'].convert_alpha(),
-                ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
-                 (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
+                ((config['General']['DISPLAY_WIDTH'] / 2) - (sprites_dict['gameover'].get_width() / 2),
+                 (config['General']['DISPLAY_HEIGHT'] / 2) - (sprites_dict['gameover'].get_height() / 2)))
 
 
 def initialize_game_elements():
     # Initialize first & second base
-    base1 = Base(0, DISPLAY_HEIGHT - Base.height)
-    base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
+    base1 = Base(0, config['General']['DISPLAY_HEIGHT'] - Base.height)
+    base2 = Base(Base.width, config['General']['DISPLAY_HEIGHT'] - Base.height)
 
     # Initialize bird
-    bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
+    bird = Bird((config['General']['DISPLAY_WIDTH'] / 2) - Bird.width, config['General']['DISPLAY_HEIGHT'] / 2)
 
     # Initialize pipes
-    pipe1 = Pipe(DISPLAY_WIDTH)
-    pipe2 = Pipe(DISPLAY_WIDTH + Pipe.interval)
+    pipe1 = Pipe(config['General']['DISPLAY_WIDTH'])
+    pipe2 = Pipe(config['General']['DISPLAY_WIDTH'] + Pipe.interval)
 
     return {
         "base": [base1, base2],
@@ -101,8 +99,8 @@ def main():
     # Game loop
     while True:
         jump = False
-        # Define FPS
-        clock.tick(FPS)
+        # Define config['General']['FPS']
+        clock.tick(config['General']['FPS'])
         # Loop events
         for event in pygame.event.get():
             # Quit game when X is pressed
@@ -123,24 +121,17 @@ def main():
             # Clear previous screen state & render background
             screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-            # Update pipes coordinates
-            pipes_animation_handler(game_elements_dict['pipe'])
-
-            # Draw pipes to the screen
-            for pipe in game_elements_dict['pipe']:
-                pipe.draw_to_screen(screen)
-
-            # Update base coordinates
-            base_animation_handler(game_elements_dict['base'])
-
-            # Draw bases to screen
-            for base in game_elements_dict['base']:
-                base.draw_to_screen(screen)
-
             # Draw bird to screen
             game_elements_dict['bird'].draw_to_screen(screen)
 
             if start:
+                # Update pipes coordinates
+                pipes_animation_handler(game_elements_dict['pipe'])
+
+                # Draw pipes to the screen
+                for pipe in game_elements_dict['pipe']:
+                    pipe.draw_to_screen(screen)
+
                 if jump:
                     # Bird jump
                     game_elements_dict['bird'].jump()
@@ -148,6 +139,13 @@ def main():
                 else:
                     # Bird no jump
                     game_elements_dict['bird'].do_nothing()
+
+            # Update base coordinates
+            base_animation_handler(game_elements_dict['base'])
+
+            # Draw bases to screen
+            for base in game_elements_dict['base']:
+                base.draw_to_screen(screen)
 
             # Check if crashed
             if check_crash(game_elements_dict['bird'], game_elements_dict['base']):

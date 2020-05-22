@@ -5,11 +5,11 @@ import random
 
 
 class Pipe:
-    image = [sprites_dict['pipe-green'], pygame.transform.flip(sprites_dict['pipe-green'], False, True)]
+    image = [sprites_dict[config['Pipe']['color']], pygame.transform.flip(sprites_dict[config['Pipe']['color']], False, True)]
     width, height = image[0].get_width(), image[0].get_height()
-    velocity = 5
+    velocity = config['Pipe']['speed']
     gap = 125
-    interval = (config['General']['DISPLAY_WIDTH']/2) + (width/2)
+    interval = (config['General']['display_width']/2) + (width/2)
 
     def __init__(self, x):
         self._x = x
@@ -39,8 +39,8 @@ class Pipe:
         self._lower_y = val
 
     def random_y(self):
-        y = random.randint(round(config['General']['DISPLAY_HEIGHT'] * (3 / 10)),
-                           round(config['General']['DISPLAY_HEIGHT'] * (7 / 10)))
+        y = random.randint(round(config['General']['display_height'] * (3 / 10)),
+                           round(config['General']['display_height'] * (7 / 10)))
 
         self._upper_y = (y - (self.gap + self.height))
         self._lower_y = y

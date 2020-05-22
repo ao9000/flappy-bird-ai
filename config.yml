@@ -1,5 +1,15 @@
 General:
-  FPS: 30
-  DISPLAY_WIDTH: 288
-  DISPLAY_HEIGHT: 512
+  fps: 30
+  display_width: 288
+  display_height: 512
+
+Bird:
+  color: yellow
+
+Pipe:
+  color: green
+  speed: 5
+
+
+
 

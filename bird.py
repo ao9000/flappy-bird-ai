@@ -1,9 +1,10 @@
 from assets import sprites_dict
+from config_handler import config
 import pygame
 
 
 class Bird:
-    image = sprites_dict['yellowbird']
+    image = sprites_dict[config['Bird']['color']]
     width, height = image[0].get_width(), image[0].get_height()
     state_cycle_rate = 5
     max_tilt = 30

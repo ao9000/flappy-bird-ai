@@ -10,6 +10,7 @@ class Base:
         self._x = x
         self._y = y
         self._rect = None
+        self.image = self.image.convert()
 
     @property
     def rect(self):
@@ -27,6 +28,5 @@ class Base:
         self._x -= self.velocity
 
     def draw_to_screen(self, screen):
-        image = self.image.convert_alpha()
-        self._rect = screen.blit(image, (self._x, self._y))
+        self._rect = screen.blit(self.image, (self._x, self._y))
 

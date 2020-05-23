@@ -18,6 +18,7 @@ class Pipe:
         self._lower_y = None
         self._upper_rect = None
         self._lower_rect = None
+        self.image = [pipe.convert_alpha() for pipe in self.image]
 
         # Assign y
         self.random_y()
@@ -51,16 +52,13 @@ class Pipe:
         self._x -= self.velocity
 
     def get_mask(self):
-        image = [pipe for pipe in self.image]
-        masks = [pygame.mask.from_surface(pipe) for pipe in image]
+        masks = [pygame.mask.from_surface(pipe) for pipe in self.image]
 
         return masks
 
     def draw_to_screen(self, screen):
-        image = [pipe for pipe in self.image]
-
         # Lower pipe
-        self._lower_rect = screen.blit(image[0], (self._x, self._lower_y))
+        self._lower_rect = screen.blit(self.image[0], (self._x, self._lower_y))
 
         # Upper pipe
-        self._upper_rect = screen.blit(image[1], (self._x, self._upper_y))
+        self._upper_rect = screen.blit(self.image[1], (self._x, self._upper_y))

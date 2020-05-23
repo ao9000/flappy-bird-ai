@@ -19,6 +19,7 @@ class Bird:
         self._tilt = 0
         self._velocity = 0
         self._rect = None
+        self.image = [bird.convert_alpha() for bird in self.image]
 
     @property
     def rect(self):
@@ -101,16 +102,13 @@ class Bird:
         return tilted_bird
 
     def get_mask(self):
-        image = [bird for bird in self.image]
-        mask = pygame.mask.from_surface(self.tilt_bird(image[self._state], self._tilt))
+        mask = pygame.mask.from_surface(self.tilt_bird(self.image[self._state], self._tilt))
 
         return mask
 
     def draw_to_screen(self, screen):
-        image = [bird.convert_alpha() for bird in self.image]
-
         # Cycle flap animation states
         self.flap_animation_tick_handler()
 
         # Draw bird
-        self._rect = screen.blit(self.tilt_bird(image[self._state], self._tilt), (self._x, self._y))
+        self._rect = screen.blit(self.tilt_bird(self.image[self._state], self._tilt), (self._x, self._y))

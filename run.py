@@ -69,8 +69,8 @@ def initialize_game_elements():
     bird = Bird((config['General']['display_width'] / 2) - Bird.width, config['General']['display_height'] / 2)
 
     # Initialize pipes
-    pipe1 = Pipe(config['General']['display_width'])
-    pipe2 = Pipe(config['General']['display_width'] + Pipe.interval)
+    pipe1 = Pipe(config['General']['display_width'] * 2)
+    pipe2 = Pipe(pipe1.x + Pipe.interval)
 
     return {
         "base": [base1, base2],
@@ -140,6 +140,10 @@ def main():
                     # Bird no jump
                     game_elements_dict['bird'].do_nothing()
 
+                # Check if crashed
+                if check_crash(game_elements_dict['bird'], game_elements_dict['base']):
+                    crashed = True
+
             # Update base coordinates
             base_animation_handler(game_elements_dict['base'])
 
@@ -147,11 +151,8 @@ def main():
             for base in game_elements_dict['base']:
                 base.draw_to_screen(screen)
 
-            # Check if crashed
-            if check_crash(game_elements_dict['bird'], game_elements_dict['base']):
-                crashed = True
-
         else:
+            pass
             # Dead
             gameover_text(screen)
 

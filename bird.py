@@ -101,7 +101,7 @@ class Bird:
         return tilted_bird
 
     def get_mask(self):
-        image = [bird.convert_alpha() for bird in self.image]
+        image = [bird for bird in self.image]
         mask = pygame.mask.from_surface(self.tilt_bird(image[self._state], self._tilt))
 
         return mask

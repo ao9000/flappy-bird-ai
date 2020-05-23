@@ -5,7 +5,8 @@ import random
 
 
 class Pipe:
-    image = [sprites_dict[config['Pipe']['color']], pygame.transform.flip(sprites_dict[config['Pipe']['color']], False, True)]
+    image = [sprites_dict[config['Pipe']['color']],
+             pygame.transform.flip(sprites_dict[config['Pipe']['color']], False, True)]
     width, height = image[0].get_width(), image[0].get_height()
     velocity = config['Pipe']['speed']
     gap = 125
@@ -49,8 +50,14 @@ class Pipe:
         # Move both pipes
         self._x -= self.velocity
 
+    def get_mask(self):
+        image = [pipe for pipe in self.image]
+        masks = [pygame.mask.from_surface(pipe) for pipe in image]
+
+        return masks
+
     def draw_to_screen(self, screen):
-        image = [pipe.convert_alpha() for pipe in self.image]
+        image = [pipe for pipe in self.image]
 
         # Lower pipe
         self._lower_rect = screen.blit(image[0], (self._x, self._lower_y))

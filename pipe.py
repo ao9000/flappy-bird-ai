@@ -35,6 +35,10 @@ class Pipe:
     def lower_y(self):
         return self._lower_y
 
+    @property
+    def upper_y(self):
+        return self._upper_y
+
     @lower_y.setter
     def lower_y(self, val):
         self._upper_y = (val - (self.gap + self.height))

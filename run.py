@@ -6,6 +6,7 @@ from pipe import Pipe
 
 import pygame
 import sys
+import math
 
 
 def quit_game():
@@ -46,9 +47,22 @@ def pipes_animation_handler(pipe_list):
             pipe.x = config['General']['display_width']
 
 
-def check_crash(bird, base):
+def check_crash(bird, base, pipes):
     if bird.rect.collidelist([item.rect for item in base]) != -1:
         return True
+
+    # Calculate offset
+    for pipe in pipes:
+        # Lower pipe
+        lower_pipe_offset = tuple(map(math.ceil, (pipe.x - bird.x, pipe.lower_y - bird.y)))
+        # Upper pipe
+        upper_pipe_offset = tuple(map(math.floor, (pipe.x - bird.x, pipe.upper_y - bird.y)))
+
+        if bird.get_mask().overlap(pipe.get_mask()[0], lower_pipe_offset):
+            return True
+
+        if bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
+            return True
 
     return False
 
@@ -141,7 +155,7 @@ def main():
                     game_elements_dict['bird'].do_nothing()
 
                 # Check if crashed
-                if check_crash(game_elements_dict['bird'], game_elements_dict['base']):
+                if check_crash(game_elements_dict['bird'], game_elements_dict['base'], game_elements_dict['pipe']):
                     crashed = True
 
             # Update base coordinates
@@ -152,7 +166,6 @@ def main():
                 base.draw_to_screen(screen)
 
         else:
-            pass
             # Dead
             gameover_text(screen)
 

@@ -6,7 +6,7 @@ class Score:
     image = sprites_dict['numbers']
 
     def __init__(self):
-        self._score = 9933
+        self._score = 0
         self._rect = []
         self.image = [number.convert_alpha() for number in self.image]
 

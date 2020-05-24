@@ -18,6 +18,7 @@ class Pipe:
         self._lower_y = None
         self._upper_rect = None
         self._lower_rect = None
+        self._passed = False
         self.image = [pipe.convert_alpha() for pipe in self.image]
 
         # Assign y
@@ -43,6 +44,14 @@ class Pipe:
     def lower_y(self, val):
         self._upper_y = (val - (self.gap + self.height))
         self._lower_y = val
+
+    @property
+    def passed(self):
+        return self._passed
+
+    @passed.setter
+    def passed(self, val):
+        self._passed = val
 
     def random_y(self):
         y = random.randint(round(config['General']['display_height'] * (3 / 10)),

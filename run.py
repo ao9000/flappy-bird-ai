@@ -3,6 +3,7 @@ from config_handler import config
 from base import Base
 from bird import Bird
 from pipe import Pipe
+from score import Score
 
 import pygame
 import sys
@@ -45,6 +46,7 @@ def pipes_animation_handler(pipe_list):
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
             pipe.x = config['General']['display_width']
+            pipe.passed = False
 
 
 def check_crash(bird, base, pipes):
@@ -67,6 +69,14 @@ def check_crash(bird, base, pipes):
     return False
 
 
+def score_handler(bird, pipes, score):
+    # Check if passed pipe
+    for pipe in pipes:
+        if (bird.x + bird.width / 2) > (pipe.x + pipe.width / 2) and not pipe.passed:
+            score.score += 1
+            pipe.passed = True
+
+
 def gameover_text(screen):
     # Game-over text
     screen.blit(sprites_dict['gameover'].convert_alpha(),
@@ -86,10 +96,14 @@ def initialize_game_elements():
     pipe1 = Pipe(config['General']['display_width'] * 2)
     pipe2 = Pipe(pipe1.x + Pipe.interval)
 
+    # Initialize score
+    score = Score()
+
     return {
         "base": [base1, base2],
         "bird": bird,
-        "pipe": [pipe1, pipe2]
+        "pipe": [pipe1, pipe2],
+        "score": score
     }
 
 
@@ -106,9 +120,10 @@ def main():
     # Initialize game elements
     game_elements_dict = initialize_game_elements()
 
-    # Initialize crash status
+    # Initialize game variables
     crashed = False
     start = False
+    score = 0
 
     # Game loop
     while True:
@@ -153,6 +168,12 @@ def main():
                 else:
                     # Bird no jump
                     game_elements_dict['bird'].do_nothing()
+
+                # Check if passed pipe
+                score_handler(game_elements_dict['bird'], game_elements_dict['pipe'], game_elements_dict['score'])
+
+                # Render score
+                game_elements_dict['score'].draw_to_screen(screen)
 
                 # Check if crashed
                 if check_crash(game_elements_dict['bird'], game_elements_dict['base'], game_elements_dict['pipe']):

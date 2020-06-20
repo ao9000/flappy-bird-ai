@@ -1,5 +1,4 @@
 from assets import sprites_dict
-from config_handler import config
 from base import Base
 from bird import Bird
 from pipe import Pipe
@@ -8,6 +7,10 @@ from score import Score
 import pygame
 import sys
 import math
+
+DISPLAY_WIDTH = sprites_dict['background-day'].get_width()
+DISPLAY_HEIGHT = sprites_dict['background-day'].get_height()
+FPS = 30
 
 
 def quit_game():
@@ -18,7 +21,7 @@ def quit_game():
 
 def setup_game_window():
     # Define screen size
-    display_dimensions = (config['General']['display_width'], config['General']['display_height'])
+    display_dimensions = (DISPLAY_WIDTH, DISPLAY_HEIGHT)
     screen = pygame.display.set_mode(display_dimensions)
 
     # Define window caption
@@ -35,7 +38,7 @@ def base_animation_handler(base_list):
         # Check if any base has exited the left side of the screen
         # If true, place base back to the right side
         if base.x + sprites_dict['base'].get_width() <= 0:
-            base.x = config['General']['display_width']
+            base.x = DISPLAY_WIDTH
 
 
 def pipes_animation_handler(pipe_list):
@@ -45,7 +48,7 @@ def pipes_animation_handler(pipe_list):
         pipe.move()
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
-            pipe.x = config['General']['display_width']
+            pipe.x = DISPLAY_WIDTH
             pipe.passed = False
 
 
@@ -84,20 +87,20 @@ def score_handler(bird, pipes, score):
 def gameover_text(screen):
     # Game-over text
     screen.blit(sprites_dict['gameover'].convert_alpha(),
-                ((config['General']['display_width'] / 2) - (sprites_dict['gameover'].get_width() / 2),
-                 (config['General']['display_height'] / 2) - (sprites_dict['gameover'].get_height() / 2)))
+                ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
+                 (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
 
 
 def initialize_game_elements():
     # Initialize first & second base
-    base1 = Base(0, config['General']['display_height'] - Base.height)
-    base2 = Base(Base.width, config['General']['display_height'] - Base.height)
+    base1 = Base(0, DISPLAY_HEIGHT - Base.height)
+    base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
 
     # Initialize bird
-    bird = Bird((config['General']['display_width'] / 2) - Bird.width, config['General']['display_height'] / 2)
+    bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
 
     # Initialize pipes
-    pipe1 = Pipe(config['General']['display_width'] * 2)
+    pipe1 = Pipe(DISPLAY_WIDTH * 2)
     pipe2 = Pipe(pipe1.x + Pipe.interval)
 
     # Initialize score
@@ -132,7 +135,7 @@ def main():
     while True:
         jump = False
         # Define
-        clock.tick(config['General']['fps'])
+        clock.tick(FPS)
         # Loop events
         for event in pygame.event.get():
             # Quit game when X is pressed

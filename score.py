@@ -1,5 +1,4 @@
 from assets import sprites_dict
-from config_handler import config
 
 
 class Score:
@@ -36,7 +35,8 @@ class Score:
 
         for index, number in enumerate(image_list, start=0):
             self._rect.append(screen.blit(number,
-                                          ((config['General']['display_width'] / 2 - sum(image_width_list) / 2) + sum(image_width_list[0:index]),
-                                           config['General']['display_height'] / 8
+                                          ((sprites_dict['background-day'].get_width() / 2 - sum(
+                                              image_width_list) / 2) + sum(image_width_list[0:index]),
+                                           sprites_dict['background-day'].get_height() / 8
                                            ))
                               )

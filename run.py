@@ -160,13 +160,21 @@ def main():
             game_elements_dict['bird'].draw_to_screen(screen)
 
             if start:
-                # Update pipes coordinates
-                pipes_animation_handler(game_elements_dict['pipe'])
-
                 # Draw pipes to the screen
                 for pipe in game_elements_dict['pipe']:
                     pipe.draw_to_screen(screen)
 
+                # Update pipes coordinates
+                pipes_animation_handler(game_elements_dict['pipe'])
+
+            # Draw bases to screen
+            for base in game_elements_dict['base']:
+                base.draw_to_screen(screen)
+
+            # Update base coordinates
+            base_animation_handler(game_elements_dict['base'])
+
+            if start:
                 if jump:
                     # Bird jump
                     game_elements_dict['bird'].jump()
@@ -184,13 +192,6 @@ def main():
                 # Check if crashed
                 if check_crash(game_elements_dict['bird'], game_elements_dict['base'], game_elements_dict['pipe']):
                     crashed = True
-
-            # Update base coordinates
-            base_animation_handler(game_elements_dict['base'])
-
-            # Draw bases to screen
-            for base in game_elements_dict['base']:
-                base.draw_to_screen(screen)
 
         else:
             # Dead

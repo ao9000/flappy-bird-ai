@@ -66,11 +66,11 @@ def check_crash(bird, base, pipes):
         if bird.get_mask().overlap(pipe.get_mask()[0], lower_pipe_offset):
             return True
 
-        if bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
+        elif bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
             return True
 
         # Check if bird is above the sky limit and in a pipe
-        if bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
+        elif bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
             return True
 
     return False

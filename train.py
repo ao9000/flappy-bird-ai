@@ -77,14 +77,14 @@ def bird_crash_handler(game_elements_dict):
                 del game_elements_dict['birds'][index]
 
             # Hit upper pipe
-            if bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
+            elif bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
                 game_elements_dict['genomes'][index][1].fitness -= 1
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
 
             # Check if bird is above the sky limit and in a pipe
-            if bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
+            elif bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
                 game_elements_dict['genomes'][index][1].fitness -= 1
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
@@ -123,7 +123,8 @@ def initialize_game_elements(genomes):
     base1 = Base(0, DISPLAY_HEIGHT - Base.height)
     base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
 
-    # Initialize bird, neural networks
+    # Initialize bird, network and genome list
+    # These list will record the surviving birds respective network and genomes
     birds_list = []
     networks_list = []
     genomes_list = []
@@ -138,7 +139,7 @@ def initialize_game_elements(genomes):
 
         # Define starting fitness
         genome.fitness = 0
-        genomes_list.append((id, genome))
+        genomes_list.append((genome_id, genome))
 
     # Initialize pipes
     pipe1 = Pipe(DISPLAY_WIDTH * 2)
@@ -218,7 +219,7 @@ def fitness(genomes, config):
             # Neural network output (Flap or no flap?)
             for index, bird in enumerate(game_elements_dict['birds']):
                 # Award fitness for surviving
-                genomes[index][1].fitness += 0.1
+                game_elements_dict['genomes'][index][1].fitness += 0.1
 
                 # Get output of model
                 # Pass model bird location, pipes location
@@ -267,4 +268,4 @@ if __name__ == '__main__':
     population.add_reporter(stats)
 
     # Run fitness function
-    winner = population.run(fitness, 100)
+    winner = population.run(fitness, 15)

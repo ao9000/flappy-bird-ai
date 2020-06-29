@@ -44,12 +44,12 @@ def base_animation_handler(base_list):
 def pipes_animation_handler(pipe_list):
     # Check if any pipe has exited the left side of the screen
     # If true, place pipe back to the right side
-    for pipe in pipe_list:
+    for index, pipe in enumerate(pipe_list, start=0):
         pipe.move()
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
-            pipe.x = DISPLAY_WIDTH
             pipe.passed = False
+            pipe.x = pipe_list[index-1].x + pipe.interval
 
 
 def check_crash(bird, base, pipes):

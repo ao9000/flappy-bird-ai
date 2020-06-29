@@ -45,15 +45,15 @@ def base_animation_handler(base_list):
 def pipes_animation_handler(pipe_list):
     # Check if any pipe has exited the left side of the screen
     # If true, place pipe back to the right side
-    for pipe in pipe_list:
+    for index, pipe in enumerate(pipe_list, start=0):
         pipe.move()
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
-            pipe.x = DISPLAY_WIDTH
             pipe.passed = False
+            pipe.x = pipe_list[index-1].x + pipe.interval
 
 
-def check_crash(game_elements_dict):
+def bird_crash_handler(game_elements_dict):
     for index, bird in enumerate(game_elements_dict['birds'], start=0):
 
         # Hit base
@@ -91,29 +91,31 @@ def check_crash(game_elements_dict):
                 del game_elements_dict['birds'][index]
 
 
+def check_crash(game_elements_dict):
+    # Check if there is any bird surviving
+    if len(game_elements_dict['birds']) == 0:
+        return True
+    else:
+        return False
+
+
 def score_handler(game_elements_dict):
-    # Check if passed pipe
-    for pipe in game_elements_dict['pipe']:
-        if (game_elements_dict['birds'][0].x + game_elements_dict['birds'][0].width / 2) > (pipe.x + pipe.width / 2) and not pipe.passed:
-            pipe.passed = True
-            game_elements_dict['score'].score += 1
+    if not check_crash(game_elements_dict):
+        # Check if passed pipe
+        for pipe in game_elements_dict['pipe']:
+            if (game_elements_dict['birds'][0].x + game_elements_dict['birds'][0].width / 2) > (pipe.x + pipe.width / 2) and not pipe.passed:
+                pipe.passed = True
+                game_elements_dict['score'].score += 1
 
-            # Cycle pipe index
-            if game_elements_dict['pipe_index'] == 0:
-                game_elements_dict['pipe_index'] = 1
-            else:
-                game_elements_dict['pipe_index'] = 0
+                # Cycle pipe index
+                if game_elements_dict['pipe_index'] == 0:
+                    game_elements_dict['pipe_index'] = 1
+                else:
+                    game_elements_dict['pipe_index'] = 0
 
-            # Add fitness score to remaining birds which passed the pipe
-            for genome_id, genome in game_elements_dict['genomes']:
-                genome.fitness += 5
-
-
-def gameover_text(screen):
-    # Game-over text
-    screen.blit(sprites_dict['gameover'].convert_alpha(),
-                ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
-                 (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
+                # Add fitness score to remaining birds which passed the pipe
+                for genome_id, genome in game_elements_dict['genomes']:
+                    genome.fitness += 5
 
 
 def initialize_game_elements(genomes):
@@ -230,6 +232,9 @@ def fitness(genomes, config):
                 else:
                     bird.do_nothing()
 
+            # Check if any bird crashed
+            bird_crash_handler(game_elements_dict)
+
             # Check if passed pipe
             score_handler(game_elements_dict)
 
@@ -242,7 +247,7 @@ def fitness(genomes, config):
 
         else:
             # Dead
-            gameover_text(screen)
+            break
 
         # Update screen
         pygame.display.update()
@@ -262,4 +267,4 @@ if __name__ == '__main__':
     population.add_reporter(stats)
 
     # Run fitness function
-    winner = population.run(fitness, 10)
+    winner = population.run(fitness, 100)

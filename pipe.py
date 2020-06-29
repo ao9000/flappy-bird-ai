@@ -9,7 +9,7 @@ class Pipe:
     width, height = image[0].get_width(), image[0].get_height()
     velocity = 5
     gap = 125
-    interval = (sprites_dict['background-day'].get_width()/2) + (width/2)
+    interval = 200
 
     def __init__(self, x):
         self._x = x

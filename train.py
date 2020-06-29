@@ -153,7 +153,10 @@ def initialize_game_elements(genomes):
     score = Score()
 
     # Initialize bird counter textbox
-    bird_counter = Textbox("white", "arialbd", 24, DISPLAY_WIDTH/2, 10)
+    bird_counter = Textbox("white", "arialbd", 16, (DISPLAY_WIDTH*(1/4)), 20)
+
+    # Initialize generation counter textbox
+    generation_counter = Textbox("white", "arialbd", 16, (DISPLAY_WIDTH * (3 / 4)), 20)
 
     return {
         "base": [base1, base2],
@@ -163,7 +166,8 @@ def initialize_game_elements(genomes):
         "pipe": [pipe1, pipe2],
         "pipe_index": pipe_index,
         "score": score,
-        "bird_counter": bird_counter
+        "bird_counter": bird_counter,
+        "generation_counter": generation_counter
     }
 
 
@@ -247,11 +251,13 @@ def fitness(genomes, config):
             # Render score
             game_elements_dict['score'].draw_to_screen(screen)
 
-            # Render generation
-
             # Render number of surviving birds
             game_elements_dict['bird_counter'].text = "Birds: {}".format(len(game_elements_dict['birds']))
             game_elements_dict['bird_counter'].draw_to_screen(screen)
+
+            # Render generation
+            game_elements_dict['generation_counter'].text = "Generation: {}".format(population.generation)
+            game_elements_dict['generation_counter'].draw_to_screen(screen)
 
             # Check if crashed
             if check_crash(game_elements_dict):

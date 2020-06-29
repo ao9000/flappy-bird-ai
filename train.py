@@ -153,7 +153,7 @@ def initialize_game_elements(genomes):
     score = Score()
 
     # Initialize bird counter textbox
-    bird_counter = Textbox("white", "arial", 24, DISPLAY_WIDTH/2, 10)
+    bird_counter = Textbox("white", "arialbd", 24, DISPLAY_WIDTH/2, 10)
 
     return {
         "base": [base1, base2],

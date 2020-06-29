@@ -1,8 +1,8 @@
 from assets import sprites_dict
-from base import Base
-from bird import Bird
-from pipe import Pipe
-from score import Score
+from game.base import Base
+from game.bird import Bird
+from game.pipe import Pipe
+from game.score import Score
 
 import pygame
 import sys

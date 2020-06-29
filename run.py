@@ -79,7 +79,7 @@ def check_crash(bird, base, pipes):
 def score_handler(bird, pipes, score):
     # Check if passed pipe
     for pipe in pipes:
-        if (bird.x + bird.width / 2) > (pipe.x + pipe.width / 2) and not pipe.passed:
+        if bird.x > (pipe.x + pipe.width) and not pipe.passed:
             score.score += 1
             pipe.passed = True
 

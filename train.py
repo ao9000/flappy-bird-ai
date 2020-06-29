@@ -103,7 +103,7 @@ def score_handler(game_elements_dict):
     if not check_crash(game_elements_dict):
         # Check if passed pipe
         for pipe in game_elements_dict['pipe']:
-            if (game_elements_dict['birds'][0].x + game_elements_dict['birds'][0].width / 2) > (pipe.x + pipe.width / 2) and not pipe.passed:
+            if game_elements_dict['birds'][0].x > (pipe.x + pipe.width) and not pipe.passed:
                 pipe.passed = True
                 game_elements_dict['score'].score += 1
 

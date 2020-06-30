@@ -9,6 +9,8 @@ import pygame
 import sys
 import math
 import neat
+import pickle
+import os
 
 DISPLAY_WIDTH = sprites_dict['background-day'].get_width()
 DISPLAY_HEIGHT = sprites_dict['background-day'].get_height()
@@ -86,7 +88,7 @@ def bird_crash_handler(game_elements_dict):
 
             # Check if bird is above the sky limit and in a pipe
             elif bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
-                game_elements_dict['genomes'][index][1].fitness -= 1
+                game_elements_dict['genomes'][index][1].fitness -= 10
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -265,6 +267,7 @@ def fitness(genomes, config):
 
         else:
             # Dead
+            pygame.quit()
             break
 
         # Update screen
@@ -281,8 +284,18 @@ if __name__ == '__main__':
 
     # Initialize stats reporter
     population.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    population.add_reporter(stats)
+    statistics = neat.StatisticsReporter()
+    population.add_reporter(statistics)
 
     # Run fitness function
     winner = population.run(fitness, 15)
+
+    # Save best model
+    print("Saving model")
+    with open(os.path.join("models/", "winner.pkl"), 'wb') as data:
+        pickle.dump(winner, data, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # Visualize graph
+    print("Saving graph")
+    from visualize import plot_fitness_graph
+    plot_fitness_graph(statistics, population)

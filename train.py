@@ -288,7 +288,7 @@ if __name__ == '__main__':
     population.add_reporter(statistics)
 
     # Run fitness function
-    winner = population.run(fitness, 15)
+    winner = population.run(fitness, 20)
 
     # Save best model
     print("Saving model")
@@ -298,4 +298,4 @@ if __name__ == '__main__':
     # Visualize graph
     print("Saving graph")
     from visualize import plot_fitness_graph
-    plot_fitness_graph(statistics, population)
+    plot_fitness_graph(statistics)

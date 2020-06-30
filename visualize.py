@@ -3,9 +3,9 @@ from matplotlib.ticker import MultipleLocator
 import os
 
 
-def plot_fitness_graph(statistics, population):
+def plot_fitness_graph(statistics):
     # Prepare data
-    generation_number = range(0, population.generation)
+    generation_number = range(0, len(statistics.generation_statistics))
     best_fitness = [genome.fitness for genome in statistics.most_fit_genomes]
 
     # Format graph
@@ -25,7 +25,7 @@ def plot_fitness_graph(statistics, population):
     plt.legend(loc='best')
     
     # Save figure
-    plt.savefig(os.path.join("models", "winner.png"), format='png')
+    plt.savefig(os.path.join("models", "fitness.png"), format='png')
 
     # Close
     plt.close()

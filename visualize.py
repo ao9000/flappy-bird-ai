@@ -25,7 +25,7 @@ def plot_fitness_graph(statistics):
     plt.legend(loc='best')
     
     # Save figure
-    plt.savefig(os.path.join("models", "fitness.png"), format='png')
+    plt.savefig(os.path.join("models", "fitness-{:.0f}.png".format(statistics.best_genome().fitness)), format='png')
 
     # Close
     plt.close()

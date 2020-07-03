@@ -3,7 +3,6 @@ from game.base import Base
 from game.bird import Bird
 from game.pipe import Pipe
 from game.score import Score
-from game.textbox import Textbox
 
 import pygame
 import sys
@@ -11,6 +10,7 @@ import math
 import neat
 import pickle
 import os
+from tabulate import tabulate
 
 DISPLAY_WIDTH = sprites_dict['background-day'].get_width()
 DISPLAY_HEIGHT = sprites_dict['background-day'].get_height()
@@ -61,6 +61,9 @@ def bird_crash_handler(game_elements_dict):
 
         # Hit base
         if bird.rect.collidelist([item.rect for item in game_elements_dict['base']]) != -1:
+            game_elements_dict['genomes'][index][1].fitness -= 10
+            game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
+            game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
             del game_elements_dict['networks'][index]
             del game_elements_dict['genomes'][index]
             del game_elements_dict['birds'][index]
@@ -75,6 +78,8 @@ def bird_crash_handler(game_elements_dict):
             # Hit lower pipe
             if bird.get_mask().overlap(pipe.get_mask()[0], lower_pipe_offset):
                 game_elements_dict['genomes'][index][1].fitness -= 1
+                game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
+                game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -82,6 +87,8 @@ def bird_crash_handler(game_elements_dict):
             # Hit upper pipe
             elif bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
                 game_elements_dict['genomes'][index][1].fitness -= 1
+                game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
+                game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -89,6 +96,8 @@ def bird_crash_handler(game_elements_dict):
             # Check if bird is above the sky limit and in a pipe
             elif bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
                 game_elements_dict['genomes'][index][1].fitness -= 10
+                game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
+                game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -121,13 +130,6 @@ def score_handler(game_elements_dict):
                     genome.fitness += 5
 
 
-def gameover_text(screen):
-    # Game-over text
-    screen.blit(sprites_dict['gameover'].convert_alpha(),
-                ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
-                 (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
-
-
 def initialize_game_elements(genomes):
     # Initialize first & second base
     base1 = Base(0, DISPLAY_HEIGHT - Base.height)
@@ -138,7 +140,8 @@ def initialize_game_elements(genomes):
     birds_list = []
     networks_list = []
     genomes_list = []
-    for genome_id, genome in genomes:
+    ranking = []
+    for genome_id, genome, model_name in genomes:
         # Create network for bird
         # Setup network using genome & config
         network = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -151,6 +154,9 @@ def initialize_game_elements(genomes):
         genome.fitness = 0
         genomes_list.append((genome_id, genome))
 
+        # Add model names into ranking board
+        ranking.append([model_name])
+
     # Initialize pipes
     pipe1 = Pipe(DISPLAY_WIDTH * 2)
     pipe2 = Pipe(pipe1.x + Pipe.interval)
@@ -161,22 +167,15 @@ def initialize_game_elements(genomes):
     # Initialize score
     score = Score()
 
-    # Initialize bird counter textbox
-    bird_counter = Textbox("white", "arialbd", 16, (DISPLAY_WIDTH*(1/4)), 20)
-
-    # Initialize generation counter textbox
-    generation_counter = Textbox("white", "arialbd", 16, (DISPLAY_WIDTH * (3 / 4)), 20)
-
     return {
         "base": [base1, base2],
         "birds": birds_list,
         "networks": networks_list,
         "genomes": genomes_list,
+        "ranking": ranking,
         "pipe": [pipe1, pipe2],
         "pipe_index": pipe_index,
-        "score": score,
-        "bird_counter": bird_counter,
-        "generation_counter": generation_counter
+        "score": score
     }
 
 
@@ -263,11 +262,15 @@ def fitness(genomes, config):
             # Check if crashed
             if check_crash(game_elements_dict):
                 crashed = True
-                print("Score: {}".format(game_elements_dict['score'].score))
+                # Print rankings
+                print("\nModel Rankings")
+                print(tabulate(game_elements_dict['ranking'], headers=["Model name", "Fitness score", "Pipe score"],
+                               floatfmt=".2f"))
 
         else:
             # Dead
-            gameover_text(screen)
+            pygame.quit()
+            break
 
         # Update screen
         pygame.display.update()
@@ -278,13 +281,15 @@ if __name__ == '__main__':
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                                 neat.DefaultStagnation, 'config-feedforward.txt')
 
-    # Load model
-    print("Loading model")
-    with open(os.path.join("models/", "winner.pkl"), 'rb') as data:
-        genome = pickle.load(data)
-
-    # Convert loaded genome into required data structure
-    genomes = [(1, genome)]
+    # Load all models from directory
+    genomes = []
+    for model in os.listdir("models"):
+        if model.endswith(".pkl"):
+            print("Loading model {}...".format(model))
+            with open(os.path.join("models/", model), 'rb') as data:
+                # Convert loaded genome into required data structure
+                genome = pickle.load(data)
+                genomes.append((len(genomes)+1, genome, model))
 
     # Run game
     fitness(genomes, config)

@@ -4,7 +4,6 @@ from game.bird import Bird
 from game.pipe import Pipe
 from game.score import Score
 from game.textbox import Textbox
-from visualize import plot_fitness_graph
 
 import pygame
 import sys
@@ -120,6 +119,13 @@ def score_handler(game_elements_dict):
                 # Add fitness score to remaining birds which passed the pipe
                 for genome_id, genome in game_elements_dict['genomes']:
                     genome.fitness += 5
+
+
+def gameover_text(screen):
+    # Game-over text
+    screen.blit(sprites_dict['gameover'].convert_alpha(),
+                ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
+                 (DISPLAY_HEIGHT / 2) - (sprites_dict['gameover'].get_height() / 2)))
 
 
 def initialize_game_elements(genomes):
@@ -254,22 +260,14 @@ def fitness(genomes, config):
             # Render score
             game_elements_dict['score'].draw_to_screen(screen)
 
-            # Render number of surviving birds
-            game_elements_dict['bird_counter'].text = "Birds: {}".format(len(game_elements_dict['birds']))
-            game_elements_dict['bird_counter'].draw_to_screen(screen)
-
-            # Render generation
-            game_elements_dict['generation_counter'].text = "Generation: {}".format(population.generation)
-            game_elements_dict['generation_counter'].draw_to_screen(screen)
-
             # Check if crashed
             if check_crash(game_elements_dict):
                 crashed = True
+                print("Score: {}".format(game_elements_dict['score'].score))
 
         else:
             # Dead
-            pygame.quit()
-            break
+            gameover_text(screen)
 
         # Update screen
         pygame.display.update()
@@ -280,25 +278,13 @@ if __name__ == '__main__':
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                                 neat.DefaultStagnation, 'config-feedforward.txt')
 
-    # Create population
-    population = neat.Population(config)
+    # Load model
+    print("Loading model")
+    with open(os.path.join("models/", "winner.pkl"), 'rb') as data:
+        genome = pickle.load(data)
 
-    # Initialize stats reporter
-    population.add_reporter(neat.StdOutReporter(True))
-    statistics = neat.StatisticsReporter()
-    population.add_reporter(statistics)
+    # Convert loaded genome into required data structure
+    genomes = [(1, genome)]
 
-    # Initialize checkpointer
-    population.add_reporter(neat.Checkpointer(generation_interval=5, filename_prefix='models/checkpoint-'))
-
-    # Run fitness function
-    winner = population.run(fitness, 20)
-
-    # Save best model
-    print("Saving model")
-    with open(os.path.join("models/", "winner.pkl"), 'wb') as data:
-        pickle.dump(winner, data, protocol=pickle.HIGHEST_PROTOCOL)
-
-    # Visualize graph
-    print("Saving graph")
-    plot_fitness_graph(statistics)
+    # Run game
+    fitness(genomes, config)

@@ -62,6 +62,7 @@ def bird_crash_handler(game_elements_dict):
 
         # Hit base
         if bird.rect.collidelist([item.rect for item in game_elements_dict['base']]) != -1:
+            game_elements_dict['genomes'][index][1].fitness -= 10
             del game_elements_dict['networks'][index]
             del game_elements_dict['genomes'][index]
             del game_elements_dict['birds'][index]
@@ -288,17 +289,17 @@ if __name__ == '__main__':
     statistics = neat.StatisticsReporter()
     population.add_reporter(statistics)
 
-    # Initialize checkpointer
-    population.add_reporter(neat.Checkpointer(generation_interval=5, filename_prefix='models/checkpoint-'))
-
     # Run fitness function
-    winner = population.run(fitness, 20)
+    population.run(fitness, 20)
+
+    # Get best genome and save it
+    winner = statistics.best_genome()
 
     # Save best model
-    print("Saving model")
-    with open(os.path.join("models/", "winner.pkl"), 'wb') as data:
+    print("Saving model...")
+    with open(os.path.join("models/", "winner-{:.0f}.pkl".format(winner.fitness)), 'wb') as data:
         pickle.dump(winner, data, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # Visualize graph
-    print("Saving graph")
+    # Visualize fitness graph
+    print("Saving fitness graph...")
     plot_fitness_graph(statistics)

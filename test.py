@@ -222,6 +222,7 @@ def fitness(genomes, config):
             # Draw all birds to screen
             for bird in game_elements_dict['birds']:
                 bird.draw_to_screen(screen)
+                bird.draw_name_label(game_elements_dict['ranking'][bird]['model name'], screen)
 
             # Draw pipes to the screen
             for pipe in game_elements_dict['pipe']:

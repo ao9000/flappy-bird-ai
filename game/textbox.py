@@ -3,7 +3,7 @@ from game.color import color_to_rgb
 
 
 class Textbox:
-    def __init__(self, text_color, font_name, font_size, center_x, center_y):
+    def __init__(self, text_color, font_name, font_size, center_x=None, center_y=None):
         self._text_color = color_to_rgb(text_color)
         self._font_name = font_name
         self._font_size = font_size
@@ -20,6 +20,22 @@ class Textbox:
     @text.setter
     def text(self, val):
         self._text = val
+
+    @property
+    def center_x(self):
+        return self._center_x
+
+    @center_x.setter
+    def center_x(self, val):
+        self._center_x = val
+
+    @property
+    def center_y(self):
+        return self._center_y
+
+    @center_y.setter
+    def center_y(self, val):
+        self._center_y = val
 
     def load_font(self):
         # Font handler

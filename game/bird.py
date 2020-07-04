@@ -1,4 +1,5 @@
 from assets import sprites_dict
+from game.textbox import Textbox
 import pygame
 
 
@@ -18,6 +19,7 @@ class Bird:
         self._tilt = 0
         self._velocity = 0
         self._rect = None
+        self._label = Textbox("black", "arialbd", 16)
         self.image = [bird.convert_alpha() for bird in self.image]
 
     @property
@@ -112,6 +114,16 @@ class Bird:
         mask = pygame.mask.from_surface(self.tilt_bird(self.image[self._state], self._tilt))
 
         return mask
+
+    def draw_name_label(self, model_name, screen):
+        # Draw label of bird to screen
+        # Set coordinates
+        self._label.center_x = self._x + self.width/2
+        self._label._center_y = self.y
+        self._label.text = model_name
+
+        # Draw label above bird
+        self._label.draw_to_screen(screen)
 
     def draw_to_screen(self, screen):
         # Cycle flap animation states

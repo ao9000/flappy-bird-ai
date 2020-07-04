@@ -268,7 +268,9 @@ def fitness(genomes, config):
                 crashed = True
                 # Print rankings
                 print("\nModel Rankings")
-                print(tabulate(game_elements_dict['ranking'].values(), headers="keys", floatfmt=".2f"))
+                print(tabulate(
+                    sorted(game_elements_dict['ranking'].values(), key=lambda x: (x["pipe score"], x["fitness score"]),
+                           reverse=True), headers="keys", floatfmt=".2f"))
 
         else:
             # Dead

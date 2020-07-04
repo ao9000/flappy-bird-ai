@@ -120,7 +120,7 @@ class Bird:
         # Set coordinates
         self._label.center_x = self._x + self.width/2
         self._label._center_y = self.y
-        self._label.text = model_name
+        self._label.text = model_name[:-4]
 
         # Draw label above bird
         self._label.draw_to_screen(screen)

@@ -62,8 +62,8 @@ def bird_crash_handler(game_elements_dict):
         # Hit base
         if bird.rect.collidelist([item.rect for item in game_elements_dict['base']]) != -1:
             game_elements_dict['genomes'][index][1].fitness -= 10
-            game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
-            game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
+            game_elements_dict['ranking'][bird]['fitness score'] = game_elements_dict['genomes'][index][1].fitness
+            game_elements_dict['ranking'][bird]['pipe score'] = game_elements_dict['score'].score
             del game_elements_dict['networks'][index]
             del game_elements_dict['genomes'][index]
             del game_elements_dict['birds'][index]
@@ -78,8 +78,8 @@ def bird_crash_handler(game_elements_dict):
             # Hit lower pipe
             if bird.get_mask().overlap(pipe.get_mask()[0], lower_pipe_offset):
                 game_elements_dict['genomes'][index][1].fitness -= 1
-                game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
-                game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
+                game_elements_dict['ranking'][bird]['fitness score'] = game_elements_dict['genomes'][index][1].fitness
+                game_elements_dict['ranking'][bird]['pipe score'] = game_elements_dict['score'].score
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -87,8 +87,8 @@ def bird_crash_handler(game_elements_dict):
             # Hit upper pipe
             elif bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
                 game_elements_dict['genomes'][index][1].fitness -= 1
-                game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
-                game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
+                game_elements_dict['ranking'][bird]['fitness score'] = game_elements_dict['genomes'][index][1].fitness
+                game_elements_dict['ranking'][bird]['pipe score'] = game_elements_dict['score'].score
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -96,8 +96,8 @@ def bird_crash_handler(game_elements_dict):
             # Check if bird is above the sky limit and in a pipe
             elif bird.y < 0 and pipe.x < bird.x < (pipe.x + pipe.width):
                 game_elements_dict['genomes'][index][1].fitness -= 10
-                game_elements_dict['ranking'][index].append(game_elements_dict['genomes'][index][1].fitness)
-                game_elements_dict['ranking'][index].append(game_elements_dict['score'].score)
+                game_elements_dict['ranking'][bird]['fitness score'] = game_elements_dict['genomes'][index][1].fitness
+                game_elements_dict['ranking'][bird]['pipe score'] = game_elements_dict['score'].score
                 del game_elements_dict['networks'][index]
                 del game_elements_dict['genomes'][index]
                 del game_elements_dict['birds'][index]
@@ -140,7 +140,7 @@ def initialize_game_elements(genomes):
     birds_list = []
     networks_list = []
     genomes_list = []
-    ranking = []
+    ranking = {}
     for genome_id, genome, model_name in genomes:
         # Create network for bird
         # Setup network using genome & config
@@ -148,14 +148,18 @@ def initialize_game_elements(genomes):
         networks_list.append(network)
 
         # Create bird
-        birds_list.append(Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2))
+        bird = Bird((DISPLAY_WIDTH / 2) - Bird.width, DISPLAY_HEIGHT / 2)
+        birds_list.append(bird)
 
         # Define starting fitness
         genome.fitness = 0
         genomes_list.append((genome_id, genome))
 
         # Add model names into ranking board
-        ranking.append([model_name])
+        ranking[bird] = {"model name": model_name,
+                         "fitness score": None,
+                         "pipe score": None
+                         }
 
     # Initialize pipes
     pipe1 = Pipe(DISPLAY_WIDTH * 2)
@@ -264,8 +268,7 @@ def fitness(genomes, config):
                 crashed = True
                 # Print rankings
                 print("\nModel Rankings")
-                print(tabulate(game_elements_dict['ranking'], headers=["Model name", "Fitness score", "Pipe score"],
-                               floatfmt=".2f"))
+                print(tabulate(game_elements_dict['ranking'].values(), headers="keys", floatfmt=".2f"))
 
         else:
             # Dead

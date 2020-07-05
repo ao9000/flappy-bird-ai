@@ -279,7 +279,7 @@ def fitness(genomes, config):
 if __name__ == '__main__':
     # Import config file
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
-                                neat.DefaultStagnation, 'config-feedforward.txt')
+                                neat.DefaultStagnation, 'neat-config.ini')
 
     # Create population
     population = neat.Population(config)

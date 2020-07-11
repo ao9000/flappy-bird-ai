@@ -267,6 +267,11 @@ def fitness(genomes, config):
             if check_crash(game_elements_dict):
                 crashed = True
 
+            # Over score threshold, skip generation
+            if game_elements_dict['score'].score >= 1000:
+                print("Score limit reached, skipping generation")
+                break
+
         else:
             # Dead
             pygame.quit()

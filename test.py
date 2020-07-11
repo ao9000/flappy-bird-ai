@@ -111,6 +111,20 @@ def check_crash(game_elements_dict):
         return False
 
 
+def print_rankings(game_elements_dict):
+    # Print rankings
+    print("\nModel Rankings")
+    print(tabulate(
+        sorted(game_elements_dict['ranking'].values(), key=lambda x: (x["pipe score"], x["fitness score"]),
+               reverse=True), headers="keys", floatfmt=".2f"))
+
+
+def update_rankings(game_elements_dict):
+    for index, bird in enumerate(game_elements_dict['birds'], start=0):
+        game_elements_dict['ranking'][bird]['fitness score'] = game_elements_dict['genomes'][index][1].fitness
+        game_elements_dict['ranking'][bird]['pipe score'] = game_elements_dict['score'].score
+
+
 def score_handler(game_elements_dict):
     if not check_crash(game_elements_dict):
         # Check if passed pipe
@@ -267,11 +281,13 @@ def fitness(genomes, config):
             # Check if crashed
             if check_crash(game_elements_dict):
                 crashed = True
-                # Print rankings
-                print("\nModel Rankings")
-                print(tabulate(
-                    sorted(game_elements_dict['ranking'].values(), key=lambda x: (x["pipe score"], x["fitness score"]),
-                           reverse=True), headers="keys", floatfmt=".2f"))
+                print_rankings(game_elements_dict)
+
+            # Over score threshold, ending test
+            if game_elements_dict['score'].score >= 1000:
+                update_rankings(game_elements_dict)
+                print_rankings(game_elements_dict)
+                quit_game()
 
         else:
             # Dead

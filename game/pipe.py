@@ -8,8 +8,8 @@ class Pipe:
              pygame.transform.flip(sprites_dict['pipe-green'], False, True)]
     width, height = image[0].get_width(), image[0].get_height()
     velocity = 5
-    gap = 125
-    interval = 200
+    gap = 135
+    interval = 215
 
     def __init__(self, x):
         self._x = x

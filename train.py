@@ -236,9 +236,9 @@ def fitness(genomes, config):
 
                 # Get output of model
                 # Pass model bird location, pipes location
-                output = game_elements_dict['networks'][index].activate((bird.y,
-                                                                         abs(bird.y - game_elements_dict['pipe'][game_elements_dict['pipe_index']].upper_y),
-                                                                        abs(bird.y - game_elements_dict['pipe'][game_elements_dict['pipe_index']].lower_y))
+                output = game_elements_dict['networks'][index].activate(((bird.y+bird.height/2),
+                                                                         game_elements_dict['pipe'][game_elements_dict['pipe_index']].upper_y - bird.y,
+                                                                         (bird.y+bird.height) - game_elements_dict['pipe'][game_elements_dict['pipe_index']].lower_y)
                                                                         )
                 # Activation function evaluation
                 if output[0] > 0.5:

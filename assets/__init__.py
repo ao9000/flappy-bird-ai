@@ -1,9 +1,15 @@
+"""
+    Sprites loader module for the pygame scripts.
+    This module does not load audio as i have not implemented audio for the game.
+"""
+
 import copy
 import os
 import pygame
 
 ASSET_PATH = "assets"
 
+# Dictionary of all sprites and their paths that are needed for the game
 sprites_dict = {
     # Texts
     "numbers": [
@@ -52,8 +58,7 @@ sprites_dict = {
     "pipe-red": "sprites/pipe-red.png"
 }
 
-# Add relative paths to file names
-# Load assets into pygame
+# Add ASSET_PATH path to file names, then loads the sprites into pygame objects
 for key, value in copy.deepcopy(sprites_dict).items():
     if isinstance(value, list):
         for index, value in enumerate(value):

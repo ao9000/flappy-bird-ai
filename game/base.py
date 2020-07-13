@@ -12,6 +12,7 @@ class Base:
     Base class
     Every instance of the game should have 2 Base class instances
     One rendered in the screen and another outside of the screen waiting to be rendered in once the first base moves out
+    And when the base moves completely out of the screen, reset the position to the end of the other base
 
     velocity controls the amount of pixels the base moves every tick
     image contains the loaded base pygame sprite object

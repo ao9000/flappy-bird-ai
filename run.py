@@ -1,3 +1,7 @@
+"""
+    Flappy Bird pygame clone
+"""
+
 from assets import sprites_dict
 from game.base import Base
 from game.bird import Bird
@@ -8,18 +12,30 @@ import pygame
 import sys
 import math
 
+# Global variables
 DISPLAY_WIDTH = sprites_dict['background-day'].get_width()
 DISPLAY_HEIGHT = sprites_dict['background-day'].get_height()
 FPS = 30
 
 
 def quit_game():
+    """
+    Exits the pygame window and stops the script
+    """
+
     # Exit pygame window
     pygame.quit()
     sys.exit()
 
 
 def setup_game_window():
+    """
+    Setups pygame window and caption
+
+    :return: type: pygame.surface
+    The pygame window object
+    """
+
     # Define screen size
     display_dimensions = (DISPLAY_WIDTH, DISPLAY_HEIGHT)
     screen = pygame.display.set_mode(display_dimensions)
@@ -31,6 +47,14 @@ def setup_game_window():
 
 
 def base_animation_handler(base_list):
+    """
+    Moves both base objects simultaneously
+    When any one of the base have move beyond the left side of the screen, reset the position of the base back at the
+    end of the other base
+
+    :param base_list: type: list
+    List containing both bases class instances
+    """
     for base in base_list:
         # Move both bases
         base.move()
@@ -42,10 +66,23 @@ def base_animation_handler(base_list):
 
 
 def pipes_animation_handler(pipe_list):
-    # Check if any pipe has exited the left side of the screen
-    # If true, place pipe back to the right side
+    """
+    Moves both pipe objects simultaneously
+    When any one of the pipe have move beyond the left side of the screen, reset the position of the base back at the
+    end of the other pipe with added interval width
+
+    Note: A single pipe object contains 2 pipes, the upper & lower pipe sprite
+
+    :param pipe_list: type: list
+    List containing both pipe class instances
+    """
+
     for index, pipe in enumerate(pipe_list, start=0):
+        # Move pipe
         pipe.move()
+
+        # Check if any pipe has exited the left side of the screen
+        # If true, place pipe back to the right side with added interval width
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
             pipe.passed = False
@@ -53,6 +90,28 @@ def pipes_animation_handler(pipe_list):
 
 
 def check_crash(bird, base, pipes):
+    """
+    Check if the bird has crashed in any of these ways
+    Ways to crash:
+        1. Hitting the base
+        2. Hitting the pipe (Both upper & lower pipe)
+        3. Flying above the screen height and over a pipe
+
+    :param bird: type: game.bird.Bird
+    Bird class instance
+
+    :param base: type: list
+    List containing both base class instances
+
+    :param pipes: type: list
+    List containing both base class instances
+    Note: A single pipe object contains 2 pipes, the upper & lower pipe sprite
+
+    :return: type: bool
+    Returns True if bird has crashed, else return False
+    """
+
+    # Bird has crashed at the base
     if bird.rect.collidelist([item.rect for item in base]) != -1:
         return True
 
@@ -63,9 +122,11 @@ def check_crash(bird, base, pipes):
         # Upper pipe
         upper_pipe_offset = tuple(map(math.floor, (pipe.x - bird.x, pipe.upper_y - bird.y)))
 
+        # Bird has crashed at the lower pipe
         if bird.get_mask().overlap(pipe.get_mask()[0], lower_pipe_offset):
             return True
 
+        # Bird has crashed at the upper pipe
         elif bird.get_mask().overlap(pipe.get_mask()[1], upper_pipe_offset):
             return True
 
@@ -77,14 +138,35 @@ def check_crash(bird, base, pipes):
 
 
 def score_handler(bird, pipes, score):
+    """
+    Records the game score by incrementing the score each time the bird passes the pipe fully
+
+    :param bird: type: game.bird.Bird
+    Bird class instance
+
+    :param pipes: type: list
+    List containing both base class instances
+    Note: A single pipe object contains 2 pipes, the upper & lower pipe sprite
+
+    :param score: type: game.score.Score
+    Score class instance
+    """
+
     # Check if passed pipe
     for pipe in pipes:
+        # If passed, increment score and set pipe status as passed
         if bird.x > (pipe.x + pipe.width) and not pipe.passed:
             score.score += 1
             pipe.passed = True
 
 
 def gameover_text(screen):
+    """
+    Display game-over text as well as freezing the game by not updating the screen
+
+    :param screen: type: pygame.surface
+    The surface/screen of the game for displaying purposes
+    """
     # Game-over text
     screen.blit(sprites_dict['gameover'].convert_alpha(),
                 ((DISPLAY_WIDTH / 2) - (sprites_dict['gameover'].get_width() / 2),
@@ -92,6 +174,12 @@ def gameover_text(screen):
 
 
 def initialize_game_elements():
+    """
+    Creates all class instances needed for the game, then saves all instances into a dictionary
+
+    :return: type: dict
+    A dictionary containing all the class instances needed for the game to function
+    """
     # Initialize first & second base
     base1 = Base(0, DISPLAY_HEIGHT - Base.height)
     base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
@@ -115,6 +203,21 @@ def initialize_game_elements():
 
 
 def main():
+    """
+    The main function of the game
+
+    What it does:
+        1. Setups game windows & clock
+        2. Creates all needed class instances for the game
+        3. Main game loop
+            3a. Render bird to screen
+            3b. Render pipe to screen
+            3c. Render base to screen
+            3d. Handle player input (Jump or no jump)
+            3e. Handle score increment & render score
+            3f. Check if player has crashed
+    """
+
     # Initialize pygame module
     pygame.init()
 

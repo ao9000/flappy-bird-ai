@@ -1,5 +1,5 @@
 """
-    Flappy Bird pygame clone
+    Flappy Bird clone done with pygame
 """
 
 from assets import sprites_dict
@@ -55,6 +55,7 @@ def base_animation_handler(base_list):
     :param base_list: type: list
     List containing both bases class instances
     """
+
     for base in base_list:
         # Move both bases
         base.move()

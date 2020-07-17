@@ -1,3 +1,10 @@
+"""
+    Test many NeuroEvolution of Augmenting Topologies (NEAT) model at the same time to play Flappy bird
+    And see who's the longest surviving bird
+
+    To know more about NEAT, refer to the link https://neat-python.readthedocs.io/en/latest/neat_overview.html
+"""
+
 from assets import sprites_dict
 from game.base import Base
 from game.bird import Bird
@@ -12,18 +19,30 @@ import pickle
 import os
 from tabulate import tabulate
 
+# Global variables
 DISPLAY_WIDTH = sprites_dict['background-day'].get_width()
 DISPLAY_HEIGHT = sprites_dict['background-day'].get_height()
 FPS = 30
 
 
 def quit_game():
+    """
+    Exits the pygame window and stops the script
+    """
+
     # Exit pygame window
     pygame.quit()
     sys.exit()
 
 
 def setup_game_window():
+    """
+    Setups pygame window and caption
+
+    :return: type: pygame.surface
+    The pygame window object
+    """
+
     # Define screen size
     display_dimensions = (DISPLAY_WIDTH, DISPLAY_HEIGHT)
     screen = pygame.display.set_mode(display_dimensions)
@@ -35,6 +54,15 @@ def setup_game_window():
 
 
 def base_animation_handler(base_list):
+    """
+    Moves both base objects simultaneously
+    When any one of the base have move beyond the left side of the screen, reset the position of the base back at the
+    end of the other base
+
+    :param base_list: type: list
+    List containing both bases class instances
+    """
+
     for base in base_list:
         # Move both bases
         base.move()
@@ -46,6 +74,17 @@ def base_animation_handler(base_list):
 
 
 def pipes_animation_handler(pipe_list):
+    """
+    Moves both pipe objects simultaneously
+    When any one of the pipe have move beyond the left side of the screen, reset the position of the base back at the
+    end of the other pipe with added interval width
+
+    Note: A single pipe object contains 2 pipes, the upper & lower pipe sprite
+
+    :param pipe_list: type: list
+    List containing both pipe class instances
+    """
+
     # Check if any pipe has exited the left side of the screen
     # If true, place pipe back to the right side
     for index, pipe in enumerate(pipe_list, start=0):
@@ -53,10 +92,27 @@ def pipes_animation_handler(pipe_list):
         if pipe.x + sprites_dict['pipe-green'].get_width() <= 0:
             pipe.random_y()
             pipe.passed = False
-            pipe.x = pipe_list[index-1].x + pipe.interval
+            pipe.x = pipe_list[index - 1].x + pipe.interval
 
 
-def bird_crash_handler(game_elements_dict):
+def check_crash(game_elements_dict):
+    """
+    Check if any of the bird in the population has crashed in any of these ways
+    Ways to crash:
+        1. Hitting the base
+        2. Hitting the pipe (Both upper & lower pipe)
+        3. Flying above the screen height and over a pipe
+
+    If any bird were to have crashed, these steps will be followed:
+        1. Deduct fitness score according to what object it has crashed into
+        2. Remove crashed bird's corresponding genome
+        3. Remove crashed bird's network
+        4. Remove crashed bird from the surviving bird list
+        5. Record the score and fitness of the bird
+
+    :param game_elements_dict: type: dict
+    A dictionary containing all the class instances needed for the game to function
+    """
     for index, bird in enumerate(game_elements_dict['birds'], start=0):
 
         # Hit base
@@ -103,7 +159,16 @@ def bird_crash_handler(game_elements_dict):
                 del game_elements_dict['birds'][index]
 
 
-def check_crash(game_elements_dict):
+def check_generation_crash(game_elements_dict):
+    """
+    Checks if there is any surviving birds in the population
+
+    :param game_elements_dict: type: dict
+    A dictionary containing all the class instances needed for the game to function
+
+    :return: type: bool
+    True if there are no surviving birds, else False
+    """
     # Check if there is any bird surviving
     if len(game_elements_dict['birds']) == 0:
         return True
@@ -112,6 +177,12 @@ def check_crash(game_elements_dict):
 
 
 def print_rankings(game_elements_dict):
+    """
+    Print the Model rankings in table format sorted from the best performing model in descending order
+
+    :param game_elements_dict: type: dict
+    A dictionary containing all the class instances needed for the game to function
+    """
     # Print rankings
     print("\nModel Rankings")
     print(tabulate(
@@ -120,13 +191,30 @@ def print_rankings(game_elements_dict):
 
 
 def update_rankings(game_elements_dict):
+    """
+    Update ranking of all birds regardless of their states (Dead or alive)
+
+    :param game_elements_dict:  type: dict
+    A dictionary containing all the class instances needed for the game to function
+    """
     for index, bird in enumerate(game_elements_dict['birds'], start=0):
         game_elements_dict['ranking'][bird]['fitness score'] = game_elements_dict['genomes'][index][1].fitness
         game_elements_dict['ranking'][bird]['pipe score'] = game_elements_dict['score'].score
 
 
 def score_handler(game_elements_dict):
-    if not check_crash(game_elements_dict):
+    """
+    Records the game score by incrementing the score each time the bird passes the pipe fully
+
+    Also cycles the pipe index to the next pipe for the bird so to input the correct pipe coordinates for the
+    NEAT algorithm
+
+    Lastly, adds fitness score to the surviving birds that passed any pipe
+
+    :param game_elements_dict: type: dict
+    A dictionary containing all the class instances needed for the game to function
+    """
+    if not check_generation_crash(game_elements_dict):
         # Check if passed pipe
         for pipe in game_elements_dict['pipe']:
             if game_elements_dict['birds'][0].x > (pipe.x + pipe.width) and not pipe.passed:
@@ -145,6 +233,16 @@ def score_handler(game_elements_dict):
 
 
 def initialize_game_elements(genomes):
+    """
+    Creates all class instances needed for the game, then saves all instances into a dictionary
+
+    Also creates the birds, networks and genomes list needed for the NEAT algorithm recording purposes
+    :param genomes: type list
+    List containing the genomes for every bird
+
+    :return: type: dict
+    A dictionary containing all the class instances needed for the game to function
+    """
     # Initialize first & second base
     base1 = Base(0, DISPLAY_HEIGHT - Base.height)
     base2 = Base(Base.width, DISPLAY_HEIGHT - Base.height)
@@ -198,6 +296,25 @@ def initialize_game_elements(genomes):
 
 
 def fitness(genomes, config):
+    """
+    The main function for the script
+    What it does:
+        1. Setups game windows & clock
+        2. Creates all needed class instances for the game
+        3. Main game loop
+            3a. Render bird to screen
+            3b. Render pipe to screen
+            3c. Render base to screen
+            3d. Get model output (Jump or no jump) and handle them for each bird
+            3e. Handle score increment & render score/fitness for each bird
+            3f. Check if all testing birds has crashed, if so print test results table
+
+    :param genomes: type: list
+    List containing the genomes for every bird
+
+    :param config: type: neat.config.Config
+    The NEAT configuration file object
+    """
     # Initialize pygame module
     pygame.init()
 
@@ -233,7 +350,7 @@ def fitness(genomes, config):
             # Clear previous screen state & render background
             screen.blit(sprites_dict['background-day'].convert(), (0, 0))
 
-            # Draw all birds to screen
+            # Draw all birds to screen with their model name above
             for bird in game_elements_dict['birds']:
                 bird.draw_to_screen(screen)
                 bird.draw_name_label(game_elements_dict['ranking'][bird]['model name'], screen)
@@ -270,21 +387,22 @@ def fitness(genomes, config):
                     bird.do_nothing()
 
             # Check if any bird crashed
-            bird_crash_handler(game_elements_dict)
+            check_crash(game_elements_dict)
 
-            # Check if passed pipe
+            # Award points for remaining bird if passed pipe
             score_handler(game_elements_dict)
 
             # Render score
             game_elements_dict['score'].draw_to_screen(screen)
 
-            # Check if crashed
-            if check_crash(game_elements_dict):
+            # Check if all test birds has crashed
+            if check_generation_crash(game_elements_dict):
                 crashed = True
                 print_rankings(game_elements_dict)
 
             # Over score threshold, ending test
             if game_elements_dict['score'].score >= 1000:
+                print("Score threshold reached, ending test...")
                 update_rankings(game_elements_dict)
                 print_rankings(game_elements_dict)
                 quit_game()
@@ -299,6 +417,14 @@ def fitness(genomes, config):
 
 
 if __name__ == '__main__':
+    """
+    Running NEAT testing simulation
+    
+    What it does:
+        1. Import our configuration file to use as settings values
+        2. Load all models from the model directory
+        3. Run a game with all loaded models
+    """
     # Import config file
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                                 neat.DefaultStagnation, 'neat-config.ini')
@@ -311,7 +437,7 @@ if __name__ == '__main__':
             with open(os.path.join("models/", model), 'rb') as data:
                 # Convert loaded genome into required data structure
                 genome = pickle.load(data)
-                genomes.append((len(genomes)+1, genome, model))
+                genomes.append((len(genomes) + 1, genome, model))
 
     # Run game
     fitness(genomes, config)

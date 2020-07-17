@@ -1,9 +1,25 @@
+"""
+    NEAT visualisation module used to provide information about training by graphs
+"""
+
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import os
 
 
 def plot_fitness_graph(statistics):
+    """
+    Plot a fitness graph that shows the:
+        1. Mean fitness per generation
+        2. Best fitness per generation
+        3. Standard deviation fitness per generation
+        4. Median fitness per generation
+
+    And finally saves the plotted graph into the model directory
+
+    :param statistics: type: neat.statistics.StatisticsReporter
+    Statistics reporter object that contains all relevant information about the training progress
+    """
     # Prepare data
     generation_number = range(0, len(statistics.generation_statistics))
     best_fitness = [genome.fitness for genome in statistics.most_fit_genomes]

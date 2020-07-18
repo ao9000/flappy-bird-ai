@@ -18,6 +18,7 @@ NEAT training implementation with Flappy Bird clone
 
 ### Test.py
 Testing of different NEAT models
+<br />
 ![NEAT Test](media/test.gif)
 
 Model ranking from test
@@ -46,6 +47,7 @@ To read more about NEAT, follow the link:
 [NEAT documentation](https://neat-python.readthedocs.io/en/latest/neat_overview.html "NEAT documentation")
 
 - Pygame
+
 Using pygame to build the graphical user interface (GUI) for the Flappy Bird clone.
 
 ## Getting started

@@ -41,7 +41,7 @@ def setup_game_window():
     screen = pygame.display.set_mode(display_dimensions)
 
     # Define window caption
-    pygame.display.set_caption("Flappy-Bird-AI")
+    pygame.display.set_caption("Flappy-Bird")
 
     return screen
 
